@@ -1,0 +1,24 @@
+aspectdef CFlow
+    select pragma{"BasicBlock"} end
+    apply
+   	 $pragma.insert after %{flow+="[[$pragma.content]]";}%;
+    end
+	
+    select class.method{"main"}.first_stmt end
+    apply
+    $method.insert before%{public static String flow = "";}%;
+    end
+	
+    select method{"main"}.last_stmt end
+    apply
+   	 $last_stmt.insert after %{
+		cflow.DFA dfa = null;
+		dfa = cflow.SerializeDFA.deserialize("dfa.ser");
+        Boolean passed = dfa.check(flow);
+        if(passed)
+            System.out.println("PASSOU");
+        else
+            System.out.println("NAO PASSOU");
+	}%;
+    end
+end
